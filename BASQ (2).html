@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Misión Intercolegiados</title>
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;font-family:Arial,sans-serif;color:#fff;
+  background:linear-gradient(135deg,#06101d,#102945);
+}
+.app{max-width:1100px;margin:auto;padding:20px}
+header{
+  display:flex;justify-content:space-between;align-items:center;
+  gap:20px;padding:15px 0;border-bottom:1px solid #ffffff22;
+}
+.logo{font-weight:900;font-size:20px}.logo span{color:#ff8a00}
+.progress{width:40%}.bar{height:9px;background:#ffffff18;border-radius:20px;overflow:hidden}
+#bar{height:100%;width:0;background:linear-gradient(90deg,#ff7200,#ffd000);transition:.4s}
+.small{font-size:12px;color:#aebdd0;margin-bottom:5px;display:flex;justify-content:space-between}
+.screen{display:none;padding:35px 0}.screen.active{display:block}
+.card{
+  background:#0d1d31;border:1px solid #ffffff18;border-radius:25px;
+  padding:30px;box-shadow:0 20px 60px #0006
+}
+.hero{text-align:center;padding:35px 15px}
+.ball{font-size:90px;animation:bounce 1.8s infinite}
+@keyframes bounce{50%{transform:translateY(-15px) rotate(8deg)}}
+h1{font-size:clamp(40px,7vw,75px);margin:15px 0}
+h1 span{color:#ff7900}
+h2{font-size:40px;margin:5px 0 20px}
+h3{margin-top:0}
+.subtitle{max-width:800px;margin:auto;color:#cbd7e5;font-size:18px;line-height:1.7}
+.message{
+  max-width:850px;margin:25px auto;padding:22px;text-align:left;
+  background:#ffffff08;border-left:4px solid #ff7900;border-radius:12px;
+  line-height:1.7;color:#dce6f2
+}
+.level{color:var(--accent);font-size:13px;font-weight:bold;letter-spacing:2px}
+.level-head{display:flex;justify-content:space-between;gap:15px}
+.badge{padding:10px 15px;background:#ffffff0c;border:1px solid #ffffff15;border-radius:30px}
+.story{color:#cbd7e5;line-height:1.7;white-space:pre-line}
+.visual{
+  height:130px;border-radius:18px;margin:22px 0;
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(90deg,#102b46,#071321);
+  overflow:hidden
+}
+.visual span{font-size:65px;animation:dribble .9s infinite}
+@keyframes dribble{50%{transform:translateY(25px)}}
+.question{
+  background:#071321;border:1px solid #ffffff10;border-radius:18px;padding:24px
+}
+.qtop{display:flex;justify-content:space-between;color:#9eafc2;font-size:13px}
+.question h3{font-size:20px;line-height:1.5}
+.options{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.option{
+  border:1px solid #ffffff18;background:#ffffff06;color:#fff;
+  border-radius:12px;padding:16px;text-align:left;cursor:pointer;
+  font-size:15px;min-height:60px;transition:.2s
+}
+.option:hover{background:#ffffff10}
+.option.correct{background:#168a4a44;border-color:#38e67b}
+.option.wrong{background:#c42e3b44;border-color:#ff6571}
+.option:disabled{cursor:default}
+.feedback{min-height:42px;margin-top:14px;line-height:1.5}
+.good{color:#5af18c}.bad{color:#ff6d76}
+.number-reward{
+  display:none;margin-top:18px;text-align:center;padding:18px;
+  background:linear-gradient(135deg,#2a2508,#4a3900);
+  border:2px solid #ffd000;border-radius:16px
+}
+.number-reward strong{font-size:42px;color:#ffd000;display:block;margin-top:5px}
+.code-slots{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin:22px 0}
+.slot{
+  width:48px;height:55px;display:grid;place-items:center;
+  border:2px solid #ffffff22;border-radius:10px;background:#ffffff06;
+  font-size:25px;font-weight:bold;color:#ffd000
+}
+.slot.filled{border-color:#ffd000;background:#ffd00014}
+.actions{display:flex;justify-content:space-between;margin-top:20px;gap:10px}
+button.main{
+  border:0;border-radius:12px;padding:14px 22px;
+  background:linear-gradient(135deg,#ff7900,#e95700);
+  color:#fff;font-weight:bold;cursor:pointer
+}
+button.secondary{
+  border:1px solid #ffffff18;background:#ffffff08;color:#fff;
+  border-radius:12px;padding:14px 22px;cursor:pointer
+}
+button:disabled{opacity:.35;cursor:not-allowed}
+.lock{font-size:13px;color:#8c9bad;text-align:right;margin-top:9px}
+.trophy{font-size:90px}
+.final{text-align:center}
+.hidden{display:none!important}
+.confetti{position:fixed;top:-20px;width:8px;height:14px;animation:fall 3s linear forwards;z-index:99}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg);opacity:0}}
+@media(max-width:700px){
+ header{align-items:flex-start}.progress{width:45%}
+ .level-head{flex-direction:column} .options{grid-template-columns:1fr}
+ .actions{flex-direction:column}.actions button{width:100%}
+ h2{font-size:31px}
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+<header>
+  <div class="logo">🏀 MISIÓN <span>INTERCOLEGIADOS</span></div>
+  <div class="progress">
+    <div class="small"><span id="progressText">Misión</span><span id="counter">1 / 5</span></div>
+    <div class="bar"><div id="bar"></div></div>
+  </div>
+</header>
+
+<!-- INICIO -->
+<section class="screen active" id="s0">
+<div class="hero">
+  <div class="ball">🏀</div>
+  <div class="level">DESAFÍO TÉCNICO</div>
+  <h1>MISIÓN<br><span>INTERCOLEGIADOS</span></h1>
+
+  <p class="subtitle">
+    La selección de baloncesto de la institución ha sido convocada para
+    participar en los Juegos Intercolegiados. Pero antes de entrar a la
+    competencia, el equipo deberá superar tres zonas de entrenamiento.
+  </p>
+
+  <div class="message">
+    🚨 <strong>MENSAJE DEL ENTRENADOR</strong><br><br>
+    “Un verdadero jugador no solo necesita talento. Necesita
+    <strong>control, velocidad, inteligencia y trabajo en equipo.</strong>
+    Solo quienes superen las tres zonas de entrenamiento podrán obtener
+    el código de acceso a los Juegos Intercolegiados.”
+  </div>
+
+  <div class="message">
+    🎯 <strong>¿CÓMO FUNCIONA?</strong><br><br>
+    Cada zona contiene <strong>4 preguntas</strong>. Después de responder
+    correctamente cada pregunta recibirás un <strong>número secreto</strong>.
+    <br><br>
+    🧩 Guarda todos los números: al final deberás organizarlos para formar
+    el <strong>Código del Campeón</strong>.
+    <br><br>
+    ⚠️ Una respuesta incorrecta no te elimina: tendrás que volver a intentarlo.
+    Pero no podrás avanzar hasta completar correctamente cada desafío.
+  </div>
+
+  <button class="main" onclick="show(1)">🚀 COMENZAR MISIÓN</button>
+</div>
+</section>
+
+<!-- ZONA 1 -->
+<section class="screen" id="s1">
+<div class="card" style="--accent:#ff7900">
+  <div class="level">🔐 NIVEL 1 · ZONA DE PROTECCIÓN</div>
+  <div class="level-head">
+    <h2>Dribling bajo</h2>
+    <div class="badge">🛡️ CONTROL</div>
+  </div>
+
+  <p class="story">
+🚨 ¡ATENCIÓN, EQUIPO!
+
+Han llegado a la primera zona. Los defensores intentarán quitarles
+el balón.
+
+Deberán demostrar que saben utilizar el dribling bajo para proteger
+el balón, mantenerlo cerca del cuerpo y conservar el control.
+
+Para desbloquear la siguiente zona deberán superar 4 preguntas.
+Cada respuesta correcta les entregará un número del código.
+  </p>
+
+  <div class="visual"><span>🏀</span></div>
+
+  <div class="question">
+    <div class="qtop"><span>PRUEBA DE LA ZONA</span><strong id="qcount1"></strong></div>
+    <h3 id="q1"></h3>
+    <div class="options" id="opts1"></div>
+    <div class="feedback" id="feed1"></div>
+
+    <div class="number-reward" id="reward1">
+      🔓 ¡NÚMERO DESBLOQUEADO!
+      <strong id="num1"></strong>
+      <small>Guárdalo. Forma parte del código final.</small>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="secondary" onclick="show(0)">← Inicio</button>
+    <button class="main" id="next1" disabled onclick="show(2)">🔓 Zona 2</button>
+  </div>
+  <div class="lock" id="lock1">🔒 Completa las 4 preguntas.</div>
+</div>
+</section>
+
+<!-- ZONA 2 -->
+<section class="screen" id="s2">
+<div class="card">
+  <div class="level" style="color:#ffd000">🔐 NIVEL 2 · ZONA DE CONTROL</div>
+  <div class="level-head">
+    <h2>Dribling medio</h2>
+    <div class="badge">⚡ ADAPTACIÓN</div>
+  </div>
+
+  <p class="story">
+⚡ ¡NUEVO DESAFÍO!
+
+El camino cambia constantemente. Ahora deberán desplazarse mientras
+mantienen el dominio del balón y se adaptan a los cambios de dirección.
+
+Recuerden mirar al frente, observar el espacio y tomar buenas decisiones.
+
+Superen las 4 preguntas y obtengan otros 4 números del código.
+  </p>
+
+  <div class="visual"><span style="animation-duration:.75s">🏀</span></div>
+
+  <div class="question">
+    <div class="qtop"><span>PRUEBA DE LA ZONA</span><strong id="qcount2"></strong></div>
+    <h3 id="q2"></h3>
+    <div class="options" id="opts2"></div>
+    <div class="feedback" id="feed2"></div>
+
+    <div class="number-reward" id="reward2">
+      🔓 ¡NÚMERO DESBLOQUEADO!
+      <strong id="num2"></strong>
+      <small>Guárdalo. Forma parte del código final.</small>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="secondary" onclick="show(1)">← Zona 1</button>
+    <button class="main" id="next2" disabled onclick="show(3)">🔓 Zona 3</button>
+  </div>
+  <div class="lock" id="lock2">🔒 Completa las 4 preguntas.</div>
+</div>
+</section>
+
+<!-- ZONA 3 -->
+<section class="screen" id="s3">
+<div class="card">
+  <div class="level" style="color:#ff5361">🔐 NIVEL 3 · ZONA DE VELOCIDAD</div>
+  <div class="level-head">
+    <h2>Dribling alto</h2>
+    <div class="badge">🏃 VELOCIDAD</div>
+  </div>
+
+  <p class="story">
+🚨 ¡ÚLTIMA ZONA!
+
+El camino está libre y tienen pocos segundos para llegar a la meta.
+
+Ahora deberán utilizar el dribling alto para desplazarse rápidamente,
+sin perder el control del balón.
+
+La velocidad es importante, pero recuerden:
+🏀 velocidad sin control puede significar perder el balón.
+
+Superen las últimas 4 preguntas para conseguir los números finales.
+  </p>
+
+  <div class="visual"><span style="animation-duration:.5s">🏀</span></div>
+
+  <div class="question">
+    <div class="qtop"><span>PRUEBA DE LA ZONA</span><strong id="qcount3"></strong></div>
+    <h3 id="q3"></h3>
+    <div class="options" id="opts3"></div>
+    <div class="feedback" id="feed3"></div>
+
+    <div class="number-reward" id="reward3">
+      🔓 ¡NÚMERO DESBLOQUEADO!
+      <strong id="num3"></strong>
+      <small>Guárdalo. Forma parte del código final.</small>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="secondary" onclick="show(2)">← Zona 2</button>
+    <button class="main" id="next3" disabled onclick="show(4)">🏆 Prueba final</button>
+  </div>
+  <div class="lock" id="lock3">🔒 Completa las 4 preguntas.</div>
+</div>
+</section>
+
+<!-- FINAL -->
+<section class="screen" id="s4">
+<div class="card final">
+
+  <div class="trophy">🏆</div>
+  <div class="level" style="color:#ffd000">NIVEL FINAL</div>
+  <h2>EL CÓDIGO DEL CAMPEÓN</h2>
+
+  <p class="subtitle">
+    ¡Han superado las tres zonas! Ahora deberán utilizar los números
+    obtenidos para descubrir el código de acceso.
+  </p>
+
+  <div class="message" style="text-align:center">
+    🧠 Recuerda lo aprendido:<br><br>
+    🔵 Dribling bajo → <strong>protección y control</strong><br>
+    🟡 Dribling medio → <strong>control y adaptación</strong><br>
+    🔴 Dribling alto → <strong>desplazamiento y velocidad</strong>
+  </div>
+
+  <h3>🔐 Tus números secretos</h3>
+  <div class="code-slots" id="codeSlots"></div>
+
+  <div class="question">
+    <h3>🧩 ¿Cuál es el código correcto?</h3>
+    <p style="color:#bdcad8;line-height:1.6">
+      Ordena mentalmente los números que recibiste siguiendo el orden
+      en que superaste las preguntas.
+    </p>
+
+    <div class="options" id="finalOptions"></div>
+    <div class="feedback" id="finalFeed"></div>
+  </div>
+
+  <div id="success" class="hidden">
+    <div class="number-reward" style="display:block;margin-top:25px">
+      🏆 ¡CÓDIGO DESBLOQUEADO!
+      <strong id="finalCode"></strong>
+    </div>
+
+    <h2 style="color:#ffd000;margin-top:25px">
+      🎉 ¡MISIÓN INTERCOLEGIADOS COMPLETADA!
+    </h2>
+
+    <p class="subtitle">
+      Han demostrado dominio técnico, concentración, disciplina,
+      inteligencia y trabajo en equipo.
+      <br><br>
+      🏀 ¡Ahora están preparados para representar a su institución!
+    </p>
+
+    <p class="message" style="text-align:center">
+      “La competencia comienza en la cancha, pero la victoria se construye
+      con disciplina, esfuerzo y trabajo en equipo.”
+    </p>
+
+    <button class="main" onclick="location.reload()">🔄 Jugar nuevamente</button>
+  </div>
+
+</div>
+</section>
+
+</div>
+
+<script>
+/* =========================================================
+   PREGUNTAS
+   Cada pregunta correcta entrega un número.
+   Los 12 números forman el código final.
+========================================================= */
+
+const levels={
+1:[
+ {
+  q:"¿Para qué se utiliza principalmente el dribling bajo?",
+  a:["Para correr lo más rápido posible","Para proteger y controlar el balón ante un defensor","Para lanzar al aro","Para hacer un pase"],
+  c:1,n:4,
+  e:"El dribling bajo mantiene el balón cerca del cuerpo y facilita su protección."
+ },
+ {
+  q:"Cuando un defensor está muy cerca, ¿qué debe hacer el jugador?",
+  a:["Mantener el balón bajo y protegido","Elevar mucho el balón","Mirar solamente al balón","Alejar el balón del cuerpo"],
+  c:0,n:7,
+  e:"La cercanía del balón al cuerpo ayuda a evitar que el defensor pueda robarlo."
+ },
+ {
+  q:"¿Cuál es una ventaja del dribling bajo?",
+  a:["Permite proteger mejor el balón","Hace que el balón salga de la cancha","Impide cambiar de dirección","Sirve únicamente para lanzar"],
+  c:0,n:2,
+  e:"La principal ventaja es aumentar el control y la protección."
+ },
+ {
+  q:"¿Qué combinación representa mejor el dribling bajo?",
+  a:["Velocidad y salto","Protección y control","Lanzamiento y rebote","Pase y bloqueo"],
+  c:1,n:8,
+  e:"Cuando existe presión defensiva, protección y control son fundamentales."
+ }
+],
+2:[
+ {
+  q:"¿Qué caracteriza al dribling medio?",
+  a:["Controlar el balón mientras se desplaza","Quedarse quieto","Lanzar al aro","Hacer únicamente pases"],
+  c:0,n:5,
+  e:"El dribling medio permite desplazarse conservando el dominio del balón."
+ },
+ {
+  q:"¿Por qué es importante mirar al frente durante el dribling?",
+  a:["Para no ver a los compañeros","Para observar defensores, espacios y compañeros","Para hacer rebotar más el balón","Porque el balón no debe verse nunca"],
+  c:1,n:1,
+  e:"Mirar al frente ayuda a tomar mejores decisiones."
+ },
+ {
+  q:"Si aparece un defensor en el camino, ¿qué debe hacer el jugador?",
+  a:["Continuar sin observar","Adaptar dirección y ritmo","Soltar el balón","Cerrar los ojos"],
+  c:1,n:6,
+  e:"Un buen jugador adapta su movimiento según lo que ocurre en la cancha."
+ },
+ {
+  q:"¿Qué demuestra inteligencia durante el dribling?",
+  a:["Driblar siempre a máxima velocidad","Mirar el suelo","Observar y decidir cuándo cambiar de dirección","Nunca cambiar de ritmo"],
+  c:2,n:3,
+  e:"La inteligencia consiste en observar la situación y elegir la mejor acción."
+ }
+],
+3:[
+ {
+  q:"¿Cuál es la principal función del dribling alto?",
+  a:["Proteger ante un defensor cercano","Favorecer el desplazamiento rápido","Permanecer quieto","Lanzar al aro"],
+  c:1,n:9,
+  e:"El dribling alto es útil para avanzar rápidamente cuando hay espacio."
+ },
+ {
+  q:"Si tienes mucho espacio libre delante, ¿qué dribling puede ayudarte a avanzar?",
+  a:["Dribling bajo","Dribling alto","Dribling estático","Ninguno"],
+  c:1,n:5,
+  e:"Con espacio disponible, el dribling alto favorece un desplazamiento rápido."
+ },
+ {
+  q:"¿Qué puede suceder si buscas velocidad pero pierdes el control?",
+  a:["Nada","Puedes perder el balón","Obtienes puntos","El defensor desaparece"],
+  c:1,n:1,
+  e:"La velocidad siempre debe estar acompañada de control."
+ },
+ {
+  q:"¿Qué combinación representa mejor el dribling alto?",
+  a:["Protección y defensa","Desplazamiento y velocidad","Pase y lanzamiento","Rebote y bloqueo"],
+  c:1,n:2,
+  e:"El dribling alto permite aprovechar espacios para desplazarse rápidamente."
+ }
+]
+};
+
+/* Código esperado:
+   4728 + 5163 + 9512 = 472851639512
+*/
+
+const secret=[4,7,2,8,5,1,6,3,9,5,1,2];
+
+const state={
+  1:{i:0,nums:[],done:false},
+  2:{i:0,nums:[],done:false},
+  3:{i:0,nums:[],done:false}
+};
+
+let current=0;
+
+function show(n){
+  if(n===2&&!state[1].done)return alert("🔒 Primero debes completar la Zona de Protección.");
+  if(n===3&&!state[2].done)return alert("🔒 Primero debes completar la Zona de Control.");
+  if(n===4&&!state[3].done)return alert("🔒 Primero debes completar la Zona de Velocidad.");
+
+  document.querySelectorAll(".screen").forEach(x=>x.classList.remove("active"));
+  document.getElementById("s"+n).classList.add("active");
+  current=n;
+
+  const names=["Misión","Protección","Control","Velocidad","Código del Campeón"];
+  document.getElementById("progressText").textContent=names[n];
+  document.getElementById("counter").textContent=(n+1)+" / 5";
+  document.getElementById("bar").style.width=(n*25)+"%";
+
+  if(n>=1&&n<=3)render(n);
+  if(n===4)renderCode();
+
+  scrollTo({top:0,behavior:"smooth"});
+}
+
+function render(level){
+  const data=levels[level];
+  const st=state[level];
+
+  if(st.i>=data.length){
+    completeLevel(level);
+    return;
+  }
+
+  const q=data[st.i];
+
+  document.getElementById("qcount"+level).textContent=
+    "Pregunta "+(st.i+1)+" de 4";
+
+  document.getElementById("q"+level).textContent="🧠 "+q.q;
+
+  const container=document.getElementById("opts"+level);
+  container.innerHTML="";
+
+  q.a.forEach((text,index)=>{
+    const b=document.createElement("button");
+    b.className="option";
+    b.textContent=text;
+    b.addEventListener("click",()=>answer(level,index,b));
+    container.appendChild(b);
+  });
+
+  document.getElementById("feed"+level).textContent="";
+  document.getElementById("reward"+level).style.display="none";
+}
+
+function answer(level,index,button){
+  const st=state[level];
+  const q=levels[level][st.i];
+  const buttons=document.querySelectorAll("#opts"+level+" .option");
+  const feed=document.getElementById("feed"+level);
+
+  buttons.forEach(b=>b.disabled=true);
+
+  if(index===q.c){
+    button.classList.add("correct");
+
+    st.nums.push(q.n);
+
+    feed.className="feedback good";
+    feed.innerHTML="✅ <strong>¡Respuesta correcta!</strong><br>"+q.e;
+
+    document.getElementById("num"+level).textContent=q.n;
+    document.getElementById("reward"+level).style.display="block";
+
+    createConfetti(12);
+
+    setTimeout(()=>{
+      st.i++;
+
+      if(st.i<levels[level].length){
+        render(level);
+      }else{
+        completeLevel(level);
+      }
+    },1700);
+
+  }else{
+    button.classList.add("wrong");
+
+    feed.className="feedback bad";
+    feed.innerHTML=
+      "❌ <strong>¡Todavía no!</strong><br>"+
+      "Piensa en la función de este tipo de dribling e inténtalo nuevamente.";
+
+    setTimeout(()=>{
+      buttons.forEach(b=>{
+        b.disabled=false;
+        b.classList.remove("wrong");
+      });
+    },1100);
+  }
+}
+
+function completeLevel(level){
+  state[level].done=true;
+
+  document.getElementById("next"+level).disabled=false;
+
+  document.getElementById("lock"+level).textContent=
+    "🔓 ¡ZONA SUPERADA! Has conseguido todos los números.";
+
+  document.getElementById("lock"+level).style.color="#55ed8a";
+
+  document.getElementById("q"+level).textContent=
+    "🎉 ¡ZONA COMPLETADA!";
+
+  document.getElementById("opts"+level).innerHTML="";
+
+  document.getElementById("feed"+level).className="feedback good";
+
+  document.getElementById("feed"+level).innerHTML=
+    "Has conseguido los números: <strong>"+
+    state[level].nums.join(" · ")+"</strong>";
+
+  createConfetti(25);
+}
+
+function renderCode(){
+  const slots=document.getElementById("codeSlots");
+  slots.innerHTML="";
+
+  const numbers=[
+    ...state[1].nums,
+    ...state[2].nums,
+    ...state[3].nums
+  ];
+
+  numbers.forEach(n=>{
+    const div=document.createElement("div");
+    div.className="slot filled";
+    div.textContent=n;
+    slots.appendChild(div);
+  });
+
+  document.getElementById("finalOptions").innerHTML="";
+
+  const correctCode=secret.join("");
+
+  const wrong1="472851369512";
+  const wrong2="742851639512";
+  const wrong3="472815639512";
+
+  [correctCode,wrong1,wrong2,wrong3]
+    .sort(()=>Math.random()-.5)
+    .forEach(code=>{
+      const b=document.createElement("button");
+      b.className="option";
+      b.textContent="🔐 "+code;
+
+      b.addEventListener("click",()=>{
+        checkCode(code,b,correctCode);
+      });
+
+      document.getElementById("finalOptions").appendChild(b);
+    });
+}
+
+function checkCode(code,button,correct){
+  const buttons=document.querySelectorAll("#finalOptions .option");
+
+  if(code===correct){
+    buttons.forEach(b=>b.disabled=true);
+    button.classList.add("correct");
+
+    document.getElementById("finalFeed").className="feedback good";
+    document.getElementById("finalFeed").innerHTML=
+      "🏆 <strong>¡CÓDIGO CORRECTO!</strong> Has demostrado que sabes cuándo utilizar cada tipo de dribling.";
+
+    document.getElementById("finalCode").textContent=correct;
+
+    document.getElementById("success").classList.remove("hidden");
+
+    document.getElementById("bar").style.width="100%";
+    document.getElementById("progressText").textContent="🏆 ¡Misión completada!";
+
+    createConfetti(80);
+
+  }else{
+    button.classList.add("wrong");
+
+    document.getElementById("finalFeed").className="feedback bad";
+    document.getElementById("finalFeed").textContent=
+      "❌ Código incorrecto. Revisa los números que obtuviste y vuelve a intentarlo.";
+
+    setTimeout(()=>button.classList.remove("wrong"),1000);
+  }
+}
+
+function createConfetti(amount){
+  const colors=["#ff7900","#ffd000","#168bd3","#e63946","#18b957","#fff"];
+
+  for(let i=0;i<amount;i++){
+    const p=document.createElement("div");
+    p.className="confetti";
+    p.style.left=Math.random()*100+"vw";
+    p.style.background=colors[Math.floor(Math.random()*colors.length)];
+    p.style.animationDelay=Math.random()*1.2+"s";
+    document.body.appendChild(p);
+    setTimeout(()=>p.remove(),4500);
+  }
+}
+</script>
+</body>
+</html>
